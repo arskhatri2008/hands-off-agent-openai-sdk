@@ -46,7 +46,7 @@ def handoff_input_filter(inputData:HandoffInputData):
     print("inputData", inputData)
     return HandoffInputData(
         input_history=inputData.input_history,
-        pre_handoff_items=inputData.pre_handoff_items
+        pre_handoff_items=inputData.pre_handoff_items,
         new_items=inputData.new_items,
     )
 
@@ -59,6 +59,6 @@ Triage_Agent = Agent(
 
 result = Runner.run_sync(Triage_Agent, "I want to help regarding NextJs routing",run_config=config)
 
-print(result.final_output)
+# print(result.final_output)
 
-print(result.last_agent)
+# print(result.last_agent)
