@@ -1,5 +1,5 @@
 from openai import AsyncOpenAI
-from agents import Agent, Runner, handoff,OpenAIChatCompletionsModel, RunConfig, RunContextWrapper
+from agents import Agent, Runner, handoff, OpenAIChatCompletionsModel, RunConfig, RunContextWrapper, HandoffInputData
 from dotenv import load_dotenv
 import os
 
@@ -33,19 +33,29 @@ Python_Agent = Agent(
     instructions="You are a helpful assistant that provides information about Python programming."
 )
 
-NextJs_handoff = handoff(
+async def on_handoff(ctx: RunContextWrapper[None], ):
+    print(f"Escalation agent called with reason: {ctx}")
+
+handoff_obj = handoff(
     agent=NextJs_Agent,
-    on_handoff=on_handoff,
+    on_handoff =on_handoff,
+    # input_type=EscalationData,
 )
+
+def handoff_input_filter(inputData:HandoffInputData):
+    print("inputData", inputData)
+    return HandoffInputData(
+        input_history=inputData.input_history,
+        pre_handoff_items=inputData.pre_handoff_items
+        new_items=inputData.new_items,
+    )
+
 
 Triage_Agent = Agent(
     name="Triage Assistant",
     instructions="You are a helpful assistant that navigates between NextJs and Python assistants based on the user's needs.",
-    handoffs=[NextJs_handoff, Python_Agent]
+    handoffs=[handoff_obj, Python_Agent]
 )
-
-async def on_handoff(ctx: RunContextWrapper[None], ):
-    print(f"Escalation agent called with reason: {ctx.reason}")
 
 result = Runner.run_sync(Triage_Agent, "I want to help regarding NextJs routing",run_config=config)
 
