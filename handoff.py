@@ -1,5 +1,5 @@
 from openai import AsyncOpenAI
-from agents import Agent, Runner, handoff, OpenAIChatCompletionsModel, RunConfig, RunContextWrapper, HandoffInputData
+from agents import Agent, Runner, handoff, OpenAIChatCompletionsModel, RunConfig, RunContextWrapper, HandoffInputData, function_tool
 from dotenv import load_dotenv
 import os
 
@@ -50,15 +50,28 @@ def handoff_input_filter(inputData:HandoffInputData):
         new_items=inputData.new_items,
     )
 
+@function_tool  
+async def fetch_weather(location: str) -> str:
+    
+    """Fetch the weather for a given location.
+
+    Args:
+        location: The location to fetch the weather for.
+    """
+    print(f"Fetching weather for {location}...")
+    # In real life, we'd fetch the weather from a weather API
+    return "sunny"
 
 Triage_Agent = Agent(
     name="Triage Assistant",
     instructions="You are a helpful assistant that navigates between NextJs and Python assistants based on the user's needs.",
-    handoffs=[handoff_obj, Python_Agent]
+    # handoffs=[handoff_obj, Python_Agent],
+    tools=[fetch_weather],
 )
 
-result = Runner.run_sync(Triage_Agent, "I want to help regarding NextJs routing",run_config=config)
+# result = Runner.run_sync(Triage_Agent, "I want to help regarding NextJs routing",run_config=config)
+result = Runner.run_sync(Triage_Agent, "What is weather today in karachi?",run_config=config)
 
-# print(result.final_output)
+print(result.final_output)
 
-# print(result.last_agent)
+print(result.last_agent)
