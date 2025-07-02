@@ -33,10 +33,15 @@ Python_Agent = Agent(
     instructions="You are a helpful assistant that provides information about Python programming."
 )
 
+NextJs_handoff = handoffs(
+    agent=NextJs_Agent,
+    tool_name_override="NextJs waly baba",
+)
+
 Triage_Agent = Agent(
     name="Triage Assistant",
     instructions="You are a helpful assistant that navigates between NextJs and Python assistants based on the user's needs.",
-    handoffs=[NextJs_Agent, Python_Agent]
+    handoffs=[NextJs_handoff, Python_Agent]
 )
 
 result = Runner.run_sync(Triage_Agent, "I want to help regarding python decorators",run_config=config)
